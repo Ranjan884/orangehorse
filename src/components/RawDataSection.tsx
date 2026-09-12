@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Database, Download, Upload, Search, Filter, ArrowUpDown, PlusCircle, Flame } from 'lucide-react';
+import {
+  Database,
+  Download,
+  Upload,
+  Search,
+  ArrowUpDown,
+  PlusCircle,
+  CheckCircle2,
+  AlertTriangle,
+} from 'lucide-react';
 import { AthleteSession } from '../types';
 
 interface RawDataSectionProps {
@@ -72,29 +81,11 @@ export const RawDataSection: React.FC<RawDataSectionProps> = ({
     reader.readAsText(file);
   };
 
-  const getFriendlySessionName = (sessionType: string) => {
-    switch (sessionType) {
-      case 'Match':
-        return 'Game / Race Day';
-      case 'Development Session':
-        return 'Hard Workout';
-      case 'Tactical Session':
-        return 'Medium Workout';
-      case 'Recovery Block':
-        return 'Active Recovery';
-      case 'Taper Session':
-        return 'Pre-Game Taper';
-      default:
-        return 'Rest Day';
-    }
-  };
-
   const filteredSessions = sessions
     .filter(
       (s) =>
         s.date.includes(searchTerm) ||
-        s.sessionType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        getFriendlySessionName(s.sessionType).toLowerCase().includes(searchTerm.toLowerCase())
+        s.sessionType.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
       const valA = a[sortField] ?? 0;
@@ -114,187 +105,180 @@ export const RawDataSection: React.FC<RawDataSectionProps> = ({
   };
 
   return (
-    <section className="py-4 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-      <div className="p-5 sm:p-7 rounded-3xl glass-card border border-orange-200 shadow-xs">
-        {/* Header & Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-orange-200/60">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono-code uppercase tracking-wider text-[#FF5500] font-bold mb-1">
+    <div className="space-y-6">
+      {/* Header Banner */}
+      <div className="p-5 sm:p-6 rounded-2xl neural-card border border-cyan-500/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="p-1.5 rounded-lg bg-cyan-950/80 border border-cyan-500/40 text-cyan-400">
               <Database className="w-4 h-4" />
-              <span>Past Workout History &amp; Logs</span>
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight font-display">
-              28-Day Activity Records
-            </h3>
-            <p className="text-xs text-neutral-600 mt-0.5">
-              Review every workout, track your effort points, or import your smartwatch data.
-            </p>
+            <span className="font-mono-code text-xs font-bold text-cyan-400 uppercase tracking-widest">
+              TELEMETRY ARCHIVE // WORKOUT LOGS
+            </span>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {onOpenLogWorkout && (
-              <button
-                onClick={onOpenLogWorkout}
-                className="px-3 py-1.5 rounded-full bg-[#FF5500] hover:bg-[#E84E00] text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>+ Log Workout</span>
-              </button>
-            )}
-
-            {/* Import CSV */}
-            <label className="px-3 py-1.5 rounded-full bg-white border border-neutral-200 hover:bg-orange-50 text-neutral-700 text-xs font-semibold cursor-pointer flex items-center gap-1.5 transition-colors shadow-2xs">
-              <Upload className="w-3.5 h-3.5 text-[#FF5500]" />
-              <span>Import CSV</span>
-              <input
-                type="file"
-                accept=".csv"
-                onChange={handleFileUpload}
-                className="hidden"
-                id="file-upload-csv"
-              />
-            </label>
-
-            {/* Export CSV */}
-            <button
-              onClick={onExportCSV}
-              className="px-3 py-1.5 rounded-full bg-[#1D1814] text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-neutral-800 transition-colors shadow-2xs"
-              id="btn-export-raw-csv"
-            >
-              <Download className="w-3.5 h-3.5" />
-              <span>Export CSV</span>
-            </button>
-          </div>
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-white">
+            Historical Training Sessions
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl">
+            Audit raw load points, ACWR balance history, sleep hours, and perceived exertion (RPE) across your training cycle.
+          </p>
         </div>
 
-        {importNotice && (
-          <div className="mb-4 p-3 rounded-2xl bg-orange-50 text-orange-950 text-xs font-semibold border border-orange-200 flex items-center justify-between">
-            <span>{importNotice}</span>
-            <button onClick={() => setImportNotice(null)} className="font-bold underline">
-              Dismiss
+        <div className="flex flex-wrap items-center gap-2">
+          {onOpenLogWorkout && (
+            <button
+              onClick={onOpenLogWorkout}
+              className="px-3.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-mono-code font-bold text-xs shadow-[0_0_15px_rgba(0,240,255,0.4)] transition-all flex items-center gap-1.5"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              Log New Session
             </button>
-          </div>
-        )}
+          )}
 
-        {/* Search Input */}
-        <div className="mb-4 flex items-center gap-3">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <button
+            onClick={onExportCSV}
+            className="px-3 py-1.5 rounded-xl border border-cyan-500/30 bg-slate-900/80 hover:bg-cyan-950/60 text-cyan-300 text-xs font-mono-code transition-all flex items-center gap-1.5"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Export CSV
+          </button>
+
+          <label className="px-3 py-1.5 rounded-xl border border-cyan-500/30 bg-slate-900/80 hover:bg-cyan-950/60 text-cyan-300 text-xs font-mono-code transition-all flex items-center gap-1.5 cursor-pointer">
+            <Upload className="w-3.5 h-3.5" />
+            Import CSV
             <input
-              type="text"
-              placeholder="Search by date (e.g. 2026-09) or workout type..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs font-mono-code focus:outline-none focus:ring-1 focus:ring-[#FF5500]"
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              className="hidden"
             />
-          </div>
-          <span className="text-xs font-mono-code text-neutral-500">
-            Showing {filteredSessions.length} of {sessions.length} sessions
-          </span>
+          </label>
+        </div>
+      </div>
+
+      {importNotice && (
+        <div className="p-3.5 rounded-xl bg-cyan-950/50 border border-cyan-500/40 text-xs text-cyan-200 font-mono-code flex items-center justify-between">
+          <span>{importNotice}</span>
+          <button
+            onClick={() => setImportNotice(null)}
+            className="text-cyan-400 hover:text-white"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Search and Table Container */}
+      <div className="rounded-2xl neural-card border border-cyan-500/20 overflow-hidden">
+        {/* Search Bar */}
+        <div className="p-4 border-b border-cyan-500/20 flex items-center gap-3">
+          <Search className="w-4 h-4 text-cyan-400" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Filter sessions by date (e.g. 2026-09) or workout type..."
+            className="bg-transparent border-none text-white text-xs sm:text-sm placeholder-slate-500 focus:outline-none w-full"
+          />
         </div>
 
         {/* Data Table */}
-        <div className="overflow-x-auto rounded-2xl border border-orange-100">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-orange-50/50 text-[11px] font-mono-code uppercase text-neutral-600 border-b border-orange-200/60">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs font-mono-code">
+            <thead className="bg-black/50 border-b border-slate-800 text-slate-400">
+              <tr>
                 <th
                   onClick={() => toggleSort('date')}
-                  className="py-3 px-4 font-bold cursor-pointer hover:text-black"
+                  className="p-3.5 cursor-pointer hover:text-cyan-300"
                 >
                   <span className="flex items-center gap-1">
                     Date <ArrowUpDown className="w-3 h-3" />
                   </span>
                 </th>
-                <th className="py-3 px-4 font-bold">Workout Type</th>
+                <th className="p-3.5">Session Type</th>
                 <th
                   onClick={() => toggleSort('load')}
-                  className="py-3 px-4 font-bold cursor-pointer hover:text-black"
+                  className="p-3.5 cursor-pointer hover:text-cyan-300"
                 >
                   <span className="flex items-center gap-1">
-                    Effort Points <ArrowUpDown className="w-3 h-3" />
+                    Load (AU) <ArrowUpDown className="w-3 h-3" />
                   </span>
                 </th>
                 <th
                   onClick={() => toggleSort('acwr')}
-                  className="py-3 px-4 font-bold cursor-pointer hover:text-black"
+                  className="p-3.5 cursor-pointer hover:text-cyan-300"
                 >
                   <span className="flex items-center gap-1">
-                    Training Balance <ArrowUpDown className="w-3 h-3" />
-                  </span>
-                </th>
-                <th
-                  onClick={() => toggleSort('distanceM')}
-                  className="py-3 px-4 font-bold cursor-pointer hover:text-black"
-                >
-                  <span className="flex items-center gap-1">
-                    Distance <ArrowUpDown className="w-3 h-3" />
-                  </span>
-                </th>
-                <th
-                  onClick={() => toggleSort('rpe')}
-                  className="py-3 px-4 font-bold cursor-pointer hover:text-black"
-                >
-                  <span className="flex items-center gap-1">
-                    Intensity (1-10) <ArrowUpDown className="w-3 h-3" />
+                    ACWR Ratio <ArrowUpDown className="w-3 h-3" />
                   </span>
                 </th>
                 <th
                   onClick={() => toggleSort('recovery')}
-                  className="py-3 px-4 font-bold cursor-pointer hover:text-black"
+                  className="p-3.5 cursor-pointer hover:text-cyan-300"
                 >
                   <span className="flex items-center gap-1">
-                    Recovery % <ArrowUpDown className="w-3 h-3" />
+                    Recovery <ArrowUpDown className="w-3 h-3" />
                   </span>
                 </th>
-                <th className="py-3 px-4 font-bold">Sleep</th>
+                <th
+                  onClick={() => toggleSort('rpe')}
+                  className="p-3.5 cursor-pointer hover:text-cyan-300"
+                >
+                  <span className="flex items-center gap-1">
+                    RPE (1-10) <ArrowUpDown className="w-3 h-3" />
+                  </span>
+                </th>
+                <th className="p-3.5">Sleep</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-orange-100 text-xs font-mono-code text-neutral-800">
-              {filteredSessions.map((row, idx) => (
-                <tr key={idx} className="hover:bg-orange-50/40 transition-colors">
-                  <td className="py-2.5 px-4 font-bold text-neutral-900">{row.date}</td>
-                  <td className="py-2.5 px-4">
-                    <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        row.sessionType === 'Match'
-                          ? 'bg-[#FF5500] text-white'
-                          : row.sessionType === 'Recovery Block'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : row.sessionType === 'Rest Day'
-                          ? 'bg-neutral-200 text-neutral-600'
-                          : 'bg-orange-100 text-[#EA580C]'
-                      }`}
-                    >
-                      {getFriendlySessionName(row.sessionType)}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-4 font-bold text-neutral-900">{row.load} pts</td>
-                  <td className="py-2.5 px-4">
-                    <span
-                      className={`font-bold ${
-                        (row.acwr || 1) > 1.5
-                          ? 'text-rose-600'
-                          : (row.acwr || 1) >= 0.8 && (row.acwr || 1) <= 1.3
-                          ? 'text-emerald-700'
-                          : 'text-amber-700'
-                      }`}
-                    >
-                      {row.acwr?.toFixed(2) || '—'}
-                    </span>
-                  </td>
-                  <td className="py-2.5 px-4">
-                    {row.distanceM ? `${(row.distanceM / 1000).toFixed(1)} km` : '—'}
-                  </td>
-                  <td className="py-2.5 px-4">{row.rpe} / 10</td>
-                  <td className="py-2.5 px-4 font-semibold text-emerald-700">{row.recovery}%</td>
-                  <td className="py-2.5 px-4">{row.sleepHours} hrs</td>
-                </tr>
-              ))}
+            <tbody className="divide-y divide-slate-800/60">
+              {filteredSessions.map((session, idx) => {
+                const acwrVal = session.acwr || 1;
+                return (
+                  <tr
+                    key={idx}
+                    className="hover:bg-cyan-950/20 transition-colors text-slate-300"
+                  >
+                    <td className="p-3.5 font-bold text-white whitespace-nowrap">
+                      {session.date}
+                    </td>
+                    <td className="p-3.5">
+                      <span className="px-2 py-0.5 rounded-full bg-slate-900 border border-slate-700 text-[10px] text-cyan-300">
+                        {session.sessionType}
+                      </span>
+                    </td>
+                    <td className="p-3.5 font-bold text-cyan-400">
+                      {session.load} AU
+                    </td>
+                    <td className="p-3.5">
+                      <span
+                        className={`inline-flex items-center gap-1 font-bold ${
+                          acwrVal > 1.5
+                            ? 'text-rose-400'
+                            : acwrVal >= 0.8 && acwrVal <= 1.3
+                            ? 'text-emerald-400'
+                            : 'text-amber-400'
+                        }`}
+                      >
+                        {acwrVal.toFixed(2)}
+                        {acwrVal >= 0.8 && acwrVal <= 1.3 && (
+                          <span className="text-[10px] font-normal">• Sweet Spot</span>
+                        )}
+                      </span>
+                    </td>
+                    <td className="p-3.5 text-emerald-400 font-semibold">
+                      {session.recovery}%
+                    </td>
+                    <td className="p-3.5">{session.rpe} / 10</td>
+                    <td className="p-3.5">{session.sleepHours} hrs</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       </div>
-    </section>
+    </div>
   );
 };

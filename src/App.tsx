@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { AthleteNavbar } from './components/AthleteNavbar';
+import { motion, AnimatePresence } from 'motion/react';
+import { AthleteNavbar, ActiveTabType } from './components/AthleteNavbar';
 import { AthleteHeroMetrics } from './components/AthleteHeroMetrics';
 import { WorkloadChartSection } from './components/WorkloadChartSection';
 import { SevenDayPlanSection } from './components/SevenDayPlanSection';
@@ -8,7 +9,7 @@ import { AICoachChatSection } from './components/AICoachChatSection';
 import { RawDataSection } from './components/RawDataSection';
 import { AppGuideModal } from './components/AppGuideModal';
 import { LogWorkoutModal } from './components/LogWorkoutModal';
-import { AthleteSettingsModal } from './components/AthleteSettingsModal';
+import { NeuralOnboardingModal } from './components/NeuralOnboardingModal';
 import {
   generateInitialHistory,
   calculateMetrics,
@@ -18,68 +19,84 @@ import {
 import { AthleteSession, MatchFixture, MicrocycleDay, AthleteProfile } from './types';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'plan' | 'ai-coach' | 'simulation' | 'raw-data'
-  >('dashboard');
+  // Navigation tab: overview, analytics, microcycle, coach, simulation, logs
+  const [activeTab, setActiveTab] = useState<ActiveTabType>('overview');
 
   // Modals state
   const [showGuide, setShowGuide] = useState<boolean>(false);
   const [showLogWorkout, setShowLogWorkout] = useState<boolean>(false);
-  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
 
-  // Athlete Profile
-  const [athleteProfile, setAthleteProfile] = useState<AthleteProfile>({
-    name: 'Alexandre Mercer',
-    sport: 'Soccer',
-    positionOrDiscipline: '#8 Central Midfielder',
-    goal: 'competition',
-    experienceLevel: 'Advanced',
+  // Athlete Profile: Check localStorage to see if user has already made a custom profile
+  const [athleteProfile, setAthleteProfile] = useState<AthleteProfile>(() => {
+    try {
+      const saved = localStorage.getItem('neural_athlete_profile_v2');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch {
+      // Fallback
+    }
+    return {
+      name: '',
+      sport: 'Soccer',
+      positionOrDiscipline: '',
+      goal: 'competition',
+      experienceLevel: 'Advanced',
+      daysPerWeek: 5,
+      baselineIntensity: 'Moderate',
+      isCustomProfile: false,
+    };
   });
 
-  // 28-Day Historical telemetry
-  const [sessions, setSessions] = useState<AthleteSession[]>(() => generateInitialHistory());
+  // Onboarding prompt: If profile is not customized yet, prompt user immediately on startup!
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('neural_athlete_profile_v2');
+      return !saved;
+    } catch {
+      return true;
+    }
+  });
 
-  // Current Recovery Score
+  // 28-Day Historical Telemetry calibrated to athlete profile
+  const [sessions, setSessions] = useState<AthleteSession[]>(() =>
+    generateInitialHistory(athleteProfile)
+  );
+
+  // Current Systemic Recovery / Sleep Readiness Score
   const [recoveryScore, setRecoveryScore] = useState<number>(78);
 
-  // Upcoming Match Fixtures
+  // Scheduled Match & Competition Fixtures
   const [fixtures, setFixtures] = useState<MatchFixture[]>([
     {
       id: 'fix-1',
-      opponent: 'Red Star FC',
-      competition: 'Champions Cup (QF)',
-      date: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
-      daysAway: 3,
+      opponent: 'Championship Tournament',
+      competition: 'Key Competition',
+      date: new Date(Date.now() + 4 * 86400000).toISOString().split('T')[0],
+      daysAway: 4,
       importance: 'high',
-    },
-    {
-      id: 'fix-2',
-      opponent: 'Olympique Lyon',
-      competition: 'National League',
-      date: new Date(Date.now() + 6 * 86400000).toISOString().split('T')[0],
-      daysAway: 6,
-      importance: 'medium',
     },
   ]);
 
-  // Coach Manual Overrides for 7-day plan
+  // Coach Manual Overrides for 7-Day Plan
   const [coachOverrides, setCoachOverrides] = useState<{
     [dayNum: number]: Partial<MicrocycleDay>;
   }>({});
 
   // Gemini AI Coach Executive Briefing
   const [coachSummary, setCoachSummary] = useState<string>(
-    'Synthesizing autonomous sports-science workload briefing...'
+    'Synthesizing autonomous sports-science workload briefing from live telemetry...'
   );
   const [isGeneratingSummary, setIsGeneratingSummary] = useState<boolean>(false);
   const [summarySource, setSummarySource] = useState<string>('Gemini 3.8 Flash');
 
-  // Compute live metrics (ACWR, Acute, Chronic, Injury Risk)
+  // Compute live metrics (ACWR, Acute Load, Chronic Load, Injury Risk %)
   const metrics = useMemo(() => {
     return calculateMetrics(sessions, recoveryScore);
   }, [sessions, recoveryScore]);
 
-  // Compute 7-day autonomous microcycle plan and reasoning logs
+  // Compute 7-day autonomous microcycle plan & sports-science audit logs
   const { plan, logs } = useMemo(() => {
     return generateAutonomousPlan(
       metrics.chronicLoad,
@@ -98,7 +115,7 @@ export function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          athleteName: athleteProfile.name,
+          athleteName: athleteProfile.name || 'Athlete',
           sport: athleteProfile.sport,
           goal: athleteProfile.goal,
           currentACWR: metrics.currentACWR,
@@ -134,6 +151,32 @@ export function App() {
     fetchCoachSummary();
   }, []);
 
+  // Handle Profile Creation / Recalibration
+  const handleProfileComplete = (newProfile: AthleteProfile, fixture?: MatchFixture) => {
+    try {
+      localStorage.setItem('neural_athlete_profile_v2', JSON.stringify(newProfile));
+    } catch (e) {
+      console.warn('Unable to persist profile to localStorage:', e);
+    }
+
+    setAthleteProfile(newProfile);
+    setShowOnboarding(false);
+    setShowProfileModal(false);
+
+    // Recalibrate 28-day telemetry based on new user profile
+    const calibratedSessions = generateInitialHistory(newProfile);
+    setSessions(calibratedSessions);
+
+    if (fixture) {
+      setFixtures([fixture]);
+    }
+
+    // Refresh coach summary with new profile data
+    setTimeout(() => {
+      fetchCoachSummary();
+    }, 200);
+  };
+
   // Update a single day's plan
   const handleUpdateDay = (dayNumber: number, override: Partial<MicrocycleDay>) => {
     setCoachOverrides((prev) => ({
@@ -159,7 +202,7 @@ export function App() {
     setCoachOverrides({});
   };
 
-  // Apply Simulation
+  // Apply What-If Simulation
   const handleApplySimulation = (simLoad: number, simRecovery: number) => {
     setRecoveryScore(simRecovery);
     setSessions((prev) => {
@@ -184,9 +227,9 @@ export function App() {
     });
   };
 
-  // Reset Simulation to default
+  // Reset What-If Simulation
   const handleResetSimulation = () => {
-    setSessions(generateInitialHistory());
+    setSessions(generateInitialHistory(athleteProfile));
     setRecoveryScore(78);
     setCoachOverrides({});
   };
@@ -205,10 +248,9 @@ export function App() {
     setFixtures((prev) => prev.filter((f) => f.id !== id));
   };
 
-  // Log a new workout from modal
+  // Log a new session from modal
   const handleSaveLoggedSession = (newSession: AthleteSession) => {
     setSessions((prev) => {
-      // Check if session for date exists
       const existingIdx = prev.findIndex((s) => s.date === newSession.date);
       if (existingIdx >= 0) {
         const updated = [...prev];
@@ -223,28 +265,25 @@ export function App() {
     }
   };
 
-  // 1-Click Quick Actions (from Options / Settings Modal)
+  // 1-Click Quick Recalibrations
   const handleQuickTiredAction = () => {
-    // Change today (Day 1) to recovery block (200 AU)
     handleUpdateDay(1, {
       sessionType: 'Recovery Block',
       targetLoad: 180,
-      focus: 'Active recovery flush & foam rolling (Restored Balance)',
+      focus: 'Active recovery flush & mobility (Restored Balance)',
     });
     setRecoveryScore((prev) => Math.max(45, prev - 15));
   };
 
   const handleQuickMissedWorkoutAction = () => {
-    // Yesterday was 0 load, redistribute slightly across next 3 days
     handleUpdateDay(1, {
       sessionType: 'Tactical Session',
       targetLoad: 420,
-      focus: 'Technical skills without overloading joints',
+      focus: 'Technical skills & movement without joint overload',
     });
   };
 
   const handleQuickCompetitionTaperAction = () => {
-    // Set Day 2 and Day 3 to taper sessions
     handleUpdateDay(2, {
       sessionType: 'Taper Session',
       targetLoad: 280,
@@ -253,125 +292,176 @@ export function App() {
     handleUpdateDay(3, {
       sessionType: 'Taper Session',
       targetLoad: 200,
-      focus: 'Pre-game priming & flexibility',
+      focus: 'Pre-game neuromuscular priming & stretch',
     });
   };
 
-  // Import Telemetry Sessions
+  // CSV Import/Export
   const handleImportSessions = (newSessions: AthleteSession[]) => {
     setSessions(newSessions);
   };
 
-  // Export 7-Day Plan CSV
   const handleExportPlanCSV = () => {
-    exportToCSV(plan, `Microcycle_Plan_${new Date().toISOString().split('T')[0]}.csv`);
+    exportToCSV(plan, `Neural_Microcycle_Plan_${new Date().toISOString().split('T')[0]}.csv`);
   };
 
-  // Export 28-Day Raw Telemetry CSV
   const handleExportHistoryCSV = () => {
-    exportToCSV(sessions, `Athlete_Telemetry_28D_${new Date().toISOString().split('T')[0]}.csv`);
+    exportToCSV(sessions, `Neural_Telemetry_28D_${new Date().toISOString().split('T')[0]}.csv`);
   };
 
   const nextMatch = fixtures.length > 0 ? fixtures[0] : undefined;
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#1D1814] selection:bg-[#FF5500] selection:text-white pb-20">
-      {/* Top Floating Glass Navbar */}
+    <div className="min-h-screen bg-[#04060B] text-slate-100 bg-neural-grid selection:bg-cyan-500 selection:text-black pb-20 relative overflow-x-hidden">
+      {/* Background Ambient Cyber Glows */}
+      <div className="fixed top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Top Floating Cyber Navbar */}
       <AthleteNavbar
         activeTab={activeTab}
         onSelectTab={setActiveTab}
         metrics={metrics}
-        onTriggerSummary={fetchCoachSummary}
-        isGeneratingSummary={isGeneratingSummary}
-        onExportCSV={handleExportPlanCSV}
         onOpenGuide={() => setShowGuide(true)}
         onOpenLogWorkout={() => setShowLogWorkout(true)}
-        onOpenSettings={() => setShowSettings(true)}
-        currentSport={athleteProfile.sport}
+        onOpenProfile={() => setShowProfileModal(true)}
+        profile={athleteProfile}
       />
 
-      {/* Main View Renderer based on activeTab */}
-      <main>
-        {activeTab === 'dashboard' && (
-          <>
-            <AthleteHeroMetrics
-              metrics={metrics}
-              nextMatch={nextMatch}
-              coachSummary={coachSummary}
-              isGeneratingSummary={isGeneratingSummary}
-              onRefreshSummary={fetchCoachSummary}
-              summarySource={summarySource}
-              profile={athleteProfile}
-              onOpenGuide={() => setShowGuide(true)}
-              onOpenSettings={() => setShowSettings(true)}
-            />
+      {/* Main Single-Tab Viewport with Fluid Transitions */}
+      <main className="pt-24 sm:pt-28 px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <AnimatePresence mode="wait">
+          {activeTab === 'overview' && (
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <AthleteHeroMetrics
+                metrics={metrics}
+                nextMatch={nextMatch}
+                coachSummary={coachSummary}
+                isGeneratingSummary={isGeneratingSummary}
+                onRefreshSummary={fetchCoachSummary}
+                summarySource={summarySource}
+                profile={athleteProfile}
+                onOpenGuide={() => setShowGuide(true)}
+                onOpenProfile={() => setShowProfileModal(true)}
+                onNavigateTab={setActiveTab}
+                onQuickTiredAction={handleQuickTiredAction}
+                onQuickMissedWorkoutAction={handleQuickMissedWorkoutAction}
+                onQuickCompetitionTaperAction={handleQuickCompetitionTaperAction}
+              />
+            </motion.div>
+          )}
 
-            <WorkloadChartSection sessions={sessions} />
+          {activeTab === 'analytics' && (
+            <motion.div
+              key="analytics"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <WorkloadChartSection sessions={sessions} />
+            </motion.div>
+          )}
 
-            <SevenDayPlanSection
-              plan={plan}
-              logs={logs}
-              onUpdateDay={handleUpdateDay}
-              onResetDay={handleResetDay}
-              onResetAllOverrides={handleResetAllOverrides}
-              onExportCSV={handleExportPlanCSV}
-              currentChronicLoad={metrics.chronicLoad}
-            />
-          </>
-        )}
+          {activeTab === 'microcycle' && (
+            <motion.div
+              key="microcycle"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <SevenDayPlanSection
+                plan={plan}
+                logs={logs}
+                onUpdateDay={handleUpdateDay}
+                onResetDay={handleResetDay}
+                onResetAllOverrides={handleResetAllOverrides}
+                onExportCSV={handleExportPlanCSV}
+                currentChronicLoad={metrics.chronicLoad}
+              />
+            </motion.div>
+          )}
 
-        {activeTab === 'plan' && (
-          <div className="pt-24 sm:pt-28">
-            <SevenDayPlanSection
-              plan={plan}
-              logs={logs}
-              onUpdateDay={handleUpdateDay}
-              onResetDay={handleResetDay}
-              onResetAllOverrides={handleResetAllOverrides}
-              onExportCSV={handleExportPlanCSV}
-              currentChronicLoad={metrics.chronicLoad}
-            />
-          </div>
-        )}
+          {activeTab === 'coach' && (
+            <motion.div
+              key="coach"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <AICoachChatSection
+                metrics={metrics}
+                plan={plan}
+                fixtures={fixtures}
+                profile={athleteProfile}
+              />
+            </motion.div>
+          )}
 
-        {activeTab === 'ai-coach' && (
-          <div className="pt-24 sm:pt-28">
-            <AICoachChatSection
-              metrics={metrics}
-              plan={plan}
-              fixtures={fixtures}
-              profile={athleteProfile}
-            />
-          </div>
-        )}
+          {activeTab === 'simulation' && (
+            <motion.div
+              key="simulation"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <SimulationControls
+                currentLoad={sessions[sessions.length - 1]?.load || 500}
+                currentRecovery={recoveryScore}
+                onApplySimulation={handleApplySimulation}
+                onResetSimulation={handleResetSimulation}
+                fixtures={fixtures}
+                onAddFixture={handleAddFixture}
+                onDeleteFixture={handleDeleteFixture}
+              />
+            </motion.div>
+          )}
 
-        {activeTab === 'simulation' && (
-          <div className="pt-24 sm:pt-28">
-            <SimulationControls
-              currentLoad={sessions[sessions.length - 1]?.load || 500}
-              currentRecovery={recoveryScore}
-              onApplySimulation={handleApplySimulation}
-              onResetSimulation={handleResetSimulation}
-              fixtures={fixtures}
-              onAddFixture={handleAddFixture}
-              onDeleteFixture={handleDeleteFixture}
-            />
-          </div>
-        )}
-
-        {activeTab === 'raw-data' && (
-          <div className="pt-24 sm:pt-28">
-            <RawDataSection
-              sessions={sessions}
-              onImportSessions={handleImportSessions}
-              onExportCSV={handleExportHistoryCSV}
-              onOpenLogWorkout={() => setShowLogWorkout(true)}
-            />
-          </div>
-        )}
+          {activeTab === 'logs' && (
+            <motion.div
+              key="logs"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+            >
+              <RawDataSection
+                sessions={sessions}
+                onImportSessions={handleImportSessions}
+                onExportCSV={handleExportHistoryCSV}
+                onOpenLogWorkout={() => setShowLogWorkout(true)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
-      {/* Guide / Tutorial Modal for normal people */}
+      {/* Mandatory Onboarding Modal for First Time Users */}
+      <NeuralOnboardingModal
+        isOpen={showOnboarding}
+        onComplete={handleProfileComplete}
+      />
+
+      {/* Recalibrate Profile Modal */}
+      {showProfileModal && (
+        <NeuralOnboardingModal
+          isOpen={showProfileModal}
+          onComplete={handleProfileComplete}
+          initialProfile={athleteProfile}
+          onClose={() => setShowProfileModal(false)}
+        />
+      )}
+
+      {/* System Guide / Tutorial Modal */}
       <AppGuideModal isOpen={showGuide} onClose={() => setShowGuide(false)} />
 
       {/* Log Workout Modal */}
@@ -382,28 +472,17 @@ export function App() {
         currentSport={athleteProfile.sport}
       />
 
-      {/* Athlete Settings & Preferences Modal */}
-      <AthleteSettingsModal
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-        profile={athleteProfile}
-        onUpdateProfile={(updated) => setAthleteProfile(updated)}
-        onQuickTiredAction={handleQuickTiredAction}
-        onQuickMissedWorkoutAction={handleQuickMissedWorkoutAction}
-        onQuickCompetitionTaperAction={handleQuickCompetitionTaperAction}
-      />
-
-      {/* Footer */}
-      <footer className="mt-16 pt-8 pb-12 border-t border-orange-200/60 text-center text-xs font-mono-code text-neutral-500">
+      {/* Cyber Footer */}
+      <footer className="mt-20 pt-8 pb-12 border-t border-cyan-500/20 text-center text-xs font-mono-code text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#FF5500]" />
-            <span className="text-neutral-700 font-bold">
-              OrangeHorse • Autonomous Athlete Performance Planner
+            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00F0FF] animate-pulse" />
+            <span className="text-slate-300 font-bold">
+              NEURAL // INTERFACE • ATHLETIC PERFORMANCE OS
             </span>
           </div>
-          <span>
-            Training Sweet Spot Engine (0.8–1.3 ACWR) • Multi-Sport Guardrails • Gemini 3.8 Intelligence
+          <span className="text-slate-400">
+            Tim Gabbett ACWR (0.80–1.30 Sweet Spot) • Gemini 3.8 Flash Grounding
           </span>
         </div>
       </footer>

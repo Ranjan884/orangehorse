@@ -5,16 +5,13 @@ import {
   Sparkles,
   ShieldCheck,
   Zap,
-  TrendingUp,
-  HeartPulse,
-  HelpCircle,
-  CheckCircle2,
-  ArrowRight,
-  Flame,
   Activity,
   Sliders,
   Calendar,
-  Compass
+  CheckCircle2,
+  ArrowRight,
+  HelpCircle,
+  Bot,
 } from 'lucide-react';
 
 interface AppGuideModalProps {
@@ -27,176 +24,143 @@ export const AppGuideModal: React.FC<AppGuideModalProps> = ({ isOpen, onClose })
 
   const steps = [
     {
-      title: 'Welcome to the Orange Horse Performance Planner',
-      subtitle: 'The simple way to build athletic stamina and never get injured.',
-      badge: 'Step 1 of 4 • The Big Picture',
-      icon: Flame,
+      title: 'Neural Interface Performance System',
+      subtitle: 'The high-precision science to build stamina and eliminate soft-tissue injuries.',
+      badge: 'Step 1 of 4 • System Architecture',
+      icon: Zap,
       content: (
         <div className="space-y-4">
-          <p className="text-sm text-neutral-700 leading-relaxed">
-            Most athletes and everyday runners make one common mistake: <strong>they push too hard too fast</strong>, or rest too long and lose fitness.
+          <p className="text-sm text-slate-300 leading-relaxed">
+            Most athletes face a frustrating dilemma: <strong>training too hard causes breakdown</strong>, while under-training causes lost fitness.
           </p>
-          <div className="p-4 rounded-2xl bg-orange-50/80 border border-orange-200">
-            <h4 className="font-bold text-sm text-[#FF5500] flex items-center gap-1.5 mb-1">
-              <Sparkles className="w-4 h-4" />
-              The Orange Horse Philosophy
+          <div className="p-4 rounded-xl bg-cyan-950/60 border border-cyan-500/40 shadow-[0_0_20px_rgba(0,240,255,0.15)]">
+            <h4 className="font-bold text-sm text-cyan-300 flex items-center gap-1.5 mb-1 font-display">
+              <Sparkles className="w-4 h-4 text-cyan-400" />
+              The Neural Interface Principle
             </h4>
-            <p className="text-xs text-neutral-700 leading-relaxed">
-              Just like high-performance racehorses and elite runners, your body needs steady, progressive conditioning. This app calculates your exact <strong>Training Sweet Spot</strong> so you peak at the right time without pulling muscles.
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Based on Dr. Tim Gabbett's gold-standard ACWR sports-science model, this platform continuously computes your <strong>Acute:Chronic Workload Ratio</strong> to pinpoint your biological <strong>Sweet Spot (0.80–1.30)</strong>.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-            <div className="p-3 rounded-xl bg-white border border-neutral-200">
-              <span className="text-xs font-bold text-neutral-900 block mb-1">1. Track Effort</span>
-              <span className="text-[11px] text-neutral-600">See your past workouts and daily stress in simple load points.</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <div className="p-3 rounded-xl bg-black/40 border border-cyan-500/20">
+              <span className="text-xs font-bold text-cyan-300 block mb-1 font-mono-code">1. Track Exertion</span>
+              <span className="text-[11px] text-slate-400">Log daily workouts and perceived exertion in Arbitrary Units (AU).</span>
             </div>
-            <div className="p-3 rounded-xl bg-white border border-neutral-200">
-              <span className="text-xs font-bold text-neutral-900 block mb-1">2. Stay in the Zone</span>
-              <span className="text-[11px] text-neutral-600">Keep your ratio between 0.8 and 1.3 to avoid fatigue spikes.</span>
+            <div className="p-3 rounded-xl bg-black/40 border border-cyan-500/20">
+              <span className="text-xs font-bold text-emerald-400 block mb-1 font-mono-code">2. Sweet Spot Zone</span>
+              <span className="text-[11px] text-slate-400">Stay between 0.80 and 1.30 to adapt quickly without tissue tears.</span>
             </div>
-            <div className="p-3 rounded-xl bg-white border border-neutral-200">
-              <span className="text-xs font-bold text-neutral-900 block mb-1">3. Smart 7-Day Plan</span>
-              <span className="text-[11px] text-neutral-600">Get an automated daily schedule that protects you before games.</span>
+            <div className="p-3 rounded-xl bg-black/40 border border-cyan-500/20">
+              <span className="text-xs font-bold text-indigo-400 block mb-1 font-mono-code">3. 7-Day Protocol</span>
+              <span className="text-[11px] text-slate-400">Follow an automated microcycle that schedules taper days before matches.</span>
             </div>
           </div>
         </div>
       ),
     },
     {
-      title: 'The 3 Numbers That Matter (In Plain English)',
-      subtitle: 'Understanding your body numbers without medical jargon.',
-      badge: 'Step 2 of 4 • Core Numbers',
+      title: 'The 3 Core Telemetry Metrics',
+      subtitle: 'Translating sports science into clear, actionable numbers.',
+      badge: 'Step 2 of 4 • Biometrics',
       icon: Activity,
       content: (
         <div className="space-y-3">
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200 shadow-xs">
+          <div className="p-3 rounded-xl bg-black/40 border border-cyan-500/20">
             <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#FF5500]" />
-                <span className="font-bold text-xs text-neutral-900">1. Training Balance (The Sweet Spot Ratio)</span>
-              </div>
-              <span className="text-[10px] font-mono-code px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">
-                Goal: 0.80 – 1.30
+              <span className="font-bold text-xs text-cyan-300 font-mono-code">
+                1. Acute Workload (Fatigue)
               </span>
+              <span className="text-[10px] text-slate-400 font-mono-code">7-Day Rolling Average</span>
             </div>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Think of this as a speedometer. If it's <strong>under 0.8</strong>, you're undertraining and losing fitness. If it's <strong>between 0.8 and 1.3</strong>, your body is getting stronger safely. If it spikes <strong>over 1.5</strong>, your risk of pulled muscles jumps by 300%.
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Represents what you did this past week. High acute spikes without a base cause muscle strains.
             </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200 shadow-xs">
+          <div className="p-3 rounded-xl bg-black/40 border border-indigo-500/30">
             <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <span className="font-bold text-xs text-neutral-900">2. This Week's Effort (Recent Fatigue)</span>
-              </div>
-              <span className="text-[10px] font-mono-code px-2 py-0.5 rounded-full bg-black/5 text-neutral-600">
-                7-Day Window
+              <span className="font-bold text-xs text-indigo-300 font-mono-code">
+                2. Chronic Workload (Fitness Armor)
               </span>
+              <span className="text-[10px] text-slate-400 font-mono-code">28-Day Baseline</span>
             </div>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              The total physical strain accumulated over your last 7 days. High effort is great for building speed, but too much back-to-back causes chronic burnout.
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Your conditioning foundation. Higher chronic base protects you from high-intensity sprint fatigue.
             </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200 shadow-xs">
+          <div className="p-3 rounded-xl bg-black/40 border border-emerald-500/30">
             <div className="flex items-center justify-between mb-1">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                <span className="font-bold text-xs text-neutral-900">3. Long-Term Fitness Base (Your Engine)</span>
-              </div>
-              <span className="text-[10px] font-mono-code px-2 py-0.5 rounded-full bg-blue-50 text-blue-800">
-                28-Day Baseline
+              <span className="font-bold text-xs text-emerald-300 font-mono-code">
+                3. ACWR Ratio (0.80 — 1.30)
               </span>
+              <span className="text-[10px] text-emerald-400 font-mono-code">The Sweet Spot</span>
             </div>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Your aerobic engine built over the past 4 weeks. The bigger your fitness base, the more punishment your body can safely handle without breaking down.
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Acute divided by Chronic. Below 0.8 is detraining; 0.8 to 1.3 is optimal adaptation; above 1.5 spikes soft-tissue injury risk by 200–400%.
             </p>
           </div>
         </div>
       ),
     },
     {
-      title: 'Your 7-Day Smart Workout Schedule',
-      subtitle: 'How the AI schedules your week around your matches or long runs.',
-      badge: 'Step 3 of 4 • Daily Schedule',
+      title: 'Dedicated Feature Tabs',
+      subtitle: 'Organized navigation designed for clarity and speed.',
+      badge: 'Step 3 of 4 • Navigation',
       icon: Calendar,
       content: (
-        <div className="space-y-3.5">
-          <p className="text-sm text-neutral-700 leading-relaxed">
-            Every morning, the AI looks at your current recovery and upcoming games, and balances your 7-day week:
-          </p>
+        <div className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <div className="p-3 rounded-xl bg-orange-50/50 border border-orange-100 flex items-start gap-2.5">
-              <span className="p-1 rounded-md bg-[#FF5500] text-white text-xs font-bold mt-0.5">🏁</span>
-              <div>
-                <span className="text-xs font-bold text-neutral-900 block">Game / Competition Day</span>
-                <span className="text-[11px] text-neutral-600">All-out match effort (high load points).</span>
-              </div>
+            <div className="p-3 rounded-xl bg-black/40 border border-slate-800">
+              <span className="text-xs font-bold text-cyan-300 font-mono-code block">Neural HUD</span>
+              <span className="text-[11px] text-slate-400">Live sweet spot status, vital gauges, and daily AI coach briefing.</span>
             </div>
-            <div className="p-3 rounded-xl bg-blue-50/50 border border-blue-100 flex items-start gap-2.5">
-              <span className="p-1 rounded-md bg-blue-500 text-white text-xs font-bold mt-0.5">⚡</span>
-              <div>
-                <span className="text-xs font-bold text-neutral-900 block">Hard Workout (Build Base)</span>
-                <span className="text-[11px] text-neutral-600">High intensity to raise your long-term fitness.</span>
-              </div>
+            <div className="p-3 rounded-xl bg-black/40 border border-slate-800">
+              <span className="text-xs font-bold text-cyan-300 font-mono-code block">Analytics</span>
+              <span className="text-[11px] text-slate-400">Interactive charts with visual Sweet Spot Corridor (0.8–1.3) and spike thresholds.</span>
             </div>
-            <div className="p-3 rounded-xl bg-purple-50/50 border border-purple-100 flex items-start gap-2.5">
-              <span className="p-1 rounded-md bg-purple-500 text-white text-xs font-bold mt-0.5">🎯</span>
-              <div>
-                <span className="text-xs font-bold text-neutral-900 block">Medium Skills / Form</span>
-                <span className="text-[11px] text-neutral-600">Tactics, drills, and rhythm without heavy strain.</span>
-              </div>
+            <div className="p-3 rounded-xl bg-black/40 border border-slate-800">
+              <span className="text-xs font-bold text-cyan-300 font-mono-code block">7-Day Plan</span>
+              <span className="text-[11px] text-slate-400">Autonomous weekly plan with editable target loads and decision logs.</span>
             </div>
-            <div className="p-3 rounded-xl bg-emerald-50/50 border border-emerald-100 flex items-start gap-2.5">
-              <span className="p-1 rounded-md bg-emerald-500 text-white text-xs font-bold mt-0.5">🌿</span>
-              <div>
-                <span className="text-xs font-bold text-neutral-900 block">Active Recovery & Taper</span>
-                <span className="text-[11px] text-neutral-600">Light movement, foam rolling, and pre-game rest.</span>
-              </div>
+            <div className="p-3 rounded-xl bg-black/40 border border-slate-800">
+              <span className="text-xs font-bold text-cyan-300 font-mono-code block">AI Coach Uplink</span>
+              <span className="text-[11px] text-slate-400">Ask questions in real time about nutrition, recovery, and tapering.</span>
+            </div>
+            <div className="p-3 rounded-xl bg-black/40 border border-slate-800">
+              <span className="text-xs font-bold text-cyan-300 font-mono-code block">What-If Lab</span>
+              <span className="text-[11px] text-slate-400">Simulate workouts and sleep before training to preview the impact.</span>
+            </div>
+            <div className="p-3 rounded-xl bg-black/40 border border-slate-800">
+              <span className="text-xs font-bold text-cyan-300 font-mono-code block">Session Logs</span>
+              <span className="text-[11px] text-slate-400">Historical workout table, CSV export, and batch import.</span>
             </div>
           </div>
-          <p className="text-xs text-neutral-500 bg-black/5 p-2.5 rounded-xl font-mono-code">
-            💡 <strong>Pro Tip:</strong> Click "Adjust" on any day in the table to change the workout if your schedule changes!
-          </p>
         </div>
       ),
     },
     {
-      title: 'Tools: What-If Simulator & AI Coach',
-      subtitle: 'Ask questions, test workout scenarios, and log your training.',
-      badge: 'Step 4 of 4 • Interactive Tools',
-      icon: Sliders,
+      title: 'Ready for High-Performance Training',
+      subtitle: 'Your profile has calibrated your initial telemetry.',
+      badge: 'Step 4 of 4 • Telemetry Ready',
+      icon: ShieldCheck,
       content: (
         <div className="space-y-4">
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200">
-            <h4 className="font-bold text-xs text-neutral-900 flex items-center gap-1.5 mb-1">
-              <Sliders className="w-4 h-4 text-[#FF5500]" />
-              The "What-If" Workout Simulator
+          <div className="p-4 rounded-xl bg-emerald-950/50 border border-emerald-500/40 text-emerald-300">
+            <h4 className="font-bold text-sm mb-1 font-display flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              Telemetry Online & Grounded
             </h4>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Wondering what happens if you run an extra 10km tomorrow or skip training for 3 days? Slide the controls in the <strong>What-If Simulator</strong> tab to see how your injury risk and fitness adapt in real-time!
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Whenever you complete a session, tap <strong>Log Session</strong> in the top bar to keep your ACWR updated. The system will autonomously recalibrate your upcoming days.
             </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200">
-            <h4 className="font-bold text-xs text-neutral-900 flex items-center gap-1.5 mb-1">
-              <Sparkles className="w-4 h-4 text-[#FF5500]" />
-              AI Performance Coach (Chat anytime)
-            </h4>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              In the <strong>AI Coach</strong> tab, you can ask in plain English: <em>"Why do I feel sluggish today?"</em> or <em>"How should I eat before Saturday's game?"</em> and get instant sports-science advice.
-            </p>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200">
-            <h4 className="font-bold text-xs text-neutral-900 flex items-center gap-1.5 mb-1">
-              <PlusIcon className="w-4 h-4 text-[#FF5500]" />
-              + Log Today's Workout Button
-            </h4>
-            <p className="text-xs text-neutral-600 leading-relaxed">
-              Click the orange <strong>"+ Log Workout"</strong> button in the top navigation anytime to record your sessions in 10 seconds.
-            </p>
+          <div className="p-3 rounded-xl bg-black/40 border border-cyan-500/20 text-xs text-slate-300 space-y-1 font-mono-code">
+            <div className="text-cyan-400 font-bold">Pro-Tips:</div>
+            <div>• Feeling fatigued? Tap 'I Feel Tired' on the HUD for an instant active flush.</div>
+            <div>• Schedule upcoming matches in the What-If Lab to activate automatic tapering.</div>
           </div>
         </div>
       ),
@@ -205,114 +169,94 @@ export const AppGuideModal: React.FC<AppGuideModalProps> = ({ isOpen, onClose })
 
   if (!isOpen) return null;
 
-  const current = steps[activeStep];
-  const Icon = current.icon;
+  const currentStep = steps[activeStep];
+  const StepIcon = currentStep.icon;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="relative w-full max-w-2xl bg-[#FAF8F5] border border-orange-200/90 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-        id="app-guide-modal-container"
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        className="w-full max-w-2xl rounded-2xl neural-card border border-cyan-500/30 overflow-hidden shadow-[0_0_50px_rgba(0,240,255,0.2)] flex flex-col max-h-[90vh]"
       >
-        {/* Top Header */}
-        <div className="px-6 py-4 border-b border-orange-200/60 bg-white/70 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#FF5500] text-white flex items-center justify-center font-bold shadow-xs">
-              🐎
+        {/* Modal Header */}
+        <div className="p-5 sm:p-6 border-b border-cyan-500/20 flex items-center justify-between bg-black/40">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-400/50 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+              <StepIcon className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] font-mono-code uppercase font-semibold text-[#FF5500]">
-                {current.badge}
+              <span className="text-[10px] font-mono-code uppercase font-bold text-cyan-400 tracking-wider">
+                {currentStep.badge}
               </span>
-              <h3 className="text-base font-bold text-neutral-900 leading-tight">
-                {current.title}
+              <h3 className="text-lg font-display font-bold text-white">
+                {currentStep.title}
               </h3>
             </div>
           </div>
+
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-black/5 text-neutral-500 hover:text-neutral-900 transition-colors"
-            id="close-guide-modal-btn"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white border border-slate-800 hover:border-cyan-500/30"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Step Tabs Indicator */}
-        <div className="flex border-b border-orange-100 bg-orange-50/40 px-6 py-2 gap-1.5 overflow-x-auto">
-          {steps.map((s, idx) => (
-            <button
-              key={idx}
-              onClick={() => setActiveStep(idx)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                activeStep === idx
-                  ? 'bg-[#FF5500] text-white shadow-xs font-semibold'
-                  : 'text-neutral-600 hover:bg-orange-100/50'
-              }`}
-            >
-              {idx + 1}. {idx === 0 ? 'Start' : idx === 1 ? 'Numbers' : idx === 2 ? 'Schedule' : 'Tools'}
-            </button>
-          ))}
+        {/* Modal Content */}
+        <div className="p-5 sm:p-6 overflow-y-auto flex-1">
+          <p className="text-xs text-slate-400 font-mono-code mb-4">
+            {currentStep.subtitle}
+          </p>
+          {currentStep.content}
         </div>
 
-        {/* Main Content Body */}
-        <div className="p-6 overflow-y-auto flex-1 space-y-3">
-          <p className="text-xs text-neutral-500 font-medium">{current.subtitle}</p>
-          {current.content}
-        </div>
-
-        {/* Footer Navigation */}
-        <div className="px-6 py-3.5 border-t border-orange-200/60 bg-white/80 flex items-center justify-between">
-          <button
-            onClick={() => setActiveStep((prev) => Math.max(0, prev - 1))}
-            disabled={activeStep === 0}
-            className="px-4 py-2 rounded-full text-xs font-semibold text-neutral-600 hover:text-neutral-900 disabled:opacity-30 transition-all"
-          >
-            Previous
-          </button>
-
-          <div className="flex items-center gap-1.5">
+        {/* Modal Footer Controls */}
+        <div className="p-4 sm:p-5 border-t border-cyan-500/20 bg-black/60 flex items-center justify-between">
+          <div className="flex gap-1.5">
             {steps.map((_, idx) => (
-              <span
+              <button
                 key={idx}
+                onClick={() => setActiveStep(idx)}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  activeStep === idx ? 'w-5 bg-[#FF5500]' : 'bg-neutral-300'
+                  activeStep === idx
+                    ? 'w-6 bg-cyan-400 shadow-[0_0_8px_#00F0FF]'
+                    : 'bg-slate-700 hover:bg-slate-500'
                 }`}
               />
             ))}
           </div>
 
-          {activeStep < steps.length - 1 ? (
-            <button
-              onClick={() => setActiveStep((prev) => Math.min(steps.length - 1, prev + 1))}
-              className="px-5 py-2 rounded-full bg-[#FF5500] hover:bg-[#E84E00] text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs"
-            >
-              <span>Next Step</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          ) : (
-            <button
-              onClick={onClose}
-              className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Ready to Train!</span>
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {activeStep > 0 && (
+              <button
+                onClick={() => setActiveStep((prev) => prev - 1)}
+                className="px-3 py-1.5 rounded-xl border border-slate-800 bg-slate-900 text-xs font-mono-code text-slate-300 hover:text-white"
+              >
+                Previous
+              </button>
+            )}
+
+            {activeStep < steps.length - 1 ? (
+              <button
+                onClick={() => setActiveStep((prev) => prev + 1)}
+                className="px-4 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono-code text-xs shadow-[0_0_15px_rgba(0,240,255,0.3)] flex items-center gap-1"
+              >
+                Next Step
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <button
+                onClick={onClose}
+                className="px-4 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold font-mono-code text-xs shadow-[0_0_15px_rgba(0,240,255,0.4)]"
+              >
+                Enter Neural Interface
+              </button>
+            )}
+          </div>
         </div>
       </motion.div>
     </div>
   );
 };
-
-function PlusIcon(props: any) {
-  return (
-    <svg {...props} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19"></line>
-      <line x1="5" y1="12" x2="19" y2="12"></line>
-    </svg>
-  );
-}

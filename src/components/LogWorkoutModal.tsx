@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { X, Check, Flame, Zap, Calendar, Clock, Activity, Dumbbell } from 'lucide-react';
+import { X, Check, Activity, Dumbbell, Calendar, Clock } from 'lucide-react';
 import { AthleteSession, SportType } from '../types';
 
 interface LogWorkoutModalProps {
@@ -28,16 +28,14 @@ export const LogWorkoutModal: React.FC<LogWorkoutModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Simple load calculation: RPE (1-10) * minutes (scaled by standard multiplier)
-  // For standard AU load: RPE * minutes
   const calculatedLoad = Math.round(rpe * durationMinutes);
 
   const getRpeDescription = (val: number) => {
-    if (val <= 2) return 'Very Light (Casual recovery or warm-up)';
-    if (val <= 4) return 'Moderate (Can hold conversation)';
+    if (val <= 2) return 'Very Light (Active recovery or warm-up)';
+    if (val <= 4) return 'Moderate (Can hold full conversation)';
     if (val <= 6) return 'Challenging (Aerobic burn, heavy breathing)';
     if (val <= 8) return 'Hard (Vigorous pace, muscular fatigue)';
-    return 'Maximum Effort (All-out sprint, match intensity)';
+    return 'Maximum Exertion (All-out sprint, match intensity)';
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -66,213 +64,180 @@ export const LogWorkoutModal: React.FC<LogWorkoutModalProps> = ({
     onClose();
   };
 
-  const sportsList: { name: SportType; icon: string }[] = [
-    { name: 'Soccer', icon: '⚽' },
-    { name: 'Running', icon: '🏃' },
-    { name: 'Equestrian', icon: '🐎' },
-    { name: 'Cycling', icon: '🚴' },
-    { name: 'Gym', icon: '🏋️' },
-    { name: 'Tennis', icon: '🎾' },
-    { name: 'Basketball', icon: '🏀' },
+  const sportsList: SportType[] = [
+    'Soccer',
+    'Running',
+    'Equestrian',
+    'Cycling',
+    'Gym',
+    'Tennis',
+    'Basketball',
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="relative w-full max-w-lg bg-[#FAF8F5] border border-orange-200 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-        id="log-workout-modal-container"
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        className="w-full max-w-lg rounded-2xl neural-card border border-cyan-500/30 overflow-hidden shadow-[0_0_50px_rgba(0,240,255,0.2)] max-h-[90vh] flex flex-col"
       >
         {/* Header */}
-        <div className="px-6 py-4 border-b border-orange-200/60 bg-white/80 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#FF5500] text-white flex items-center justify-center font-bold shadow-xs">
-              <Flame className="w-4 h-4" />
+        <div className="p-5 border-b border-cyan-500/20 flex items-center justify-between bg-black/40">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-400/50 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+              <Activity className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-neutral-900 leading-tight">
-                Log a Workout Session
+              <span className="text-[10px] font-mono-code uppercase font-bold text-cyan-400 tracking-wider">
+                TELEMETRY INGESTION
+              </span>
+              <h3 className="text-lg font-display font-bold text-white">
+                Log Training Session
               </h3>
-              <p className="text-xs text-neutral-500">
-                Instantly calculates your training load and updates your weekly plan
-              </p>
             </div>
           </div>
+
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-black/5 text-neutral-500 hover:text-neutral-900 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white border border-slate-800 hover:border-cyan-500/30"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 flex-1">
-          {/* Sport / Activity Selection */}
-          <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1.5">
-              Activity / Sport
-            </label>
-            <div className="flex flex-wrap gap-1.5">
-              {sportsList.map((item) => (
-                <button
-                  type="button"
-                  key={item.name}
-                  onClick={() => setSport(item.name)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-all ${
-                    sport === item.name
-                      ? 'bg-[#FF5500] text-white shadow-xs font-bold'
-                      : 'bg-white border border-neutral-200 text-neutral-700 hover:bg-orange-50'
-                  }`}
-                >
-                  <span>{item.icon}</span>
-                  <span>{item.name}</span>
-                </button>
-              ))}
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
+          {/* Calculated Output Banner */}
+          <div className="p-4 rounded-xl bg-cyan-950/50 border border-cyan-500/30 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] font-mono-code text-cyan-400 uppercase">
+                Calculated Workload
+              </span>
+              <div className="text-2xl font-display font-bold text-white">
+                {calculatedLoad} <span className="text-xs font-mono-code text-cyan-400">AU</span>
+              </div>
+            </div>
+            <div className="text-right text-xs font-mono-code text-slate-400">
+              <div>{durationMinutes} min × RPE {rpe}</div>
+              <div className="text-[10px] text-cyan-300">
+                {calculatedLoad >= 800
+                  ? 'Match Intensity'
+                  : calculatedLoad >= 500
+                  ? 'Development Base'
+                  : calculatedLoad >= 300
+                  ? 'Moderate Technical'
+                  : 'Recovery Flush'}
+              </div>
             </div>
           </div>
 
-          {/* Date & Duration */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Date & Sport */}
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                Workout Date
-              </label>
+              <label className="block text-xs font-mono-code text-slate-400 mb-1">Date</label>
               <input
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs font-mono-code focus:outline-none focus:ring-1 focus:ring-[#FF5500]"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-cyan-400 rounded-xl text-white text-xs font-mono-code"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                Duration (Minutes)
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  min="5"
-                  max="360"
-                  step="5"
-                  value={durationMinutes}
-                  onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs font-mono-code focus:outline-none focus:ring-1 focus:ring-[#FF5500]"
-                  required
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-neutral-400 font-mono-code">
-                  min
-                </span>
-              </div>
+              <label className="block text-xs font-mono-code text-slate-400 mb-1">Sport</label>
+              <select
+                value={sport}
+                onChange={(e) => setSport(e.target.value as SportType)}
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-cyan-400 rounded-xl text-white text-xs font-mono-code"
+              >
+                {sportsList.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* Intensity Slider (RPE) */}
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200 shadow-xs">
-            <div className="flex justify-between items-center mb-1">
-              <label className="text-xs font-semibold text-neutral-800">
-                How hard was it? (Effort 1 to 10)
-              </label>
-              <span className="text-xs font-bold font-mono-code text-[#FF5500] px-2 py-0.5 rounded-full bg-orange-50">
-                Rating {rpe} / 10
-              </span>
+          {/* Duration Slider */}
+          <div className="space-y-1">
+            <div className="flex justify-between items-center text-xs font-mono-code">
+              <span className="text-slate-300">Duration (Minutes):</span>
+              <span className="text-cyan-300 font-bold">{durationMinutes} min</span>
             </div>
             <input
               type="range"
-              min="1"
-              max="10"
-              step="1"
+              min={15}
+              max={180}
+              step={5}
+              value={durationMinutes}
+              onChange={(e) => setDurationMinutes(Number(e.target.value))}
+              className="w-full accent-cyan-400 cursor-pointer"
+            />
+          </div>
+
+          {/* Effort RPE Slider */}
+          <div className="space-y-1">
+            <div className="flex justify-between items-center text-xs font-mono-code">
+              <span className="text-slate-300">Effort Rating (RPE 1-10):</span>
+              <span className="text-cyan-300 font-bold">{rpe} / 10</span>
+            </div>
+            <input
+              type="range"
+              min={1}
+              max={10}
+              step={1}
               value={rpe}
               onChange={(e) => setRpe(Number(e.target.value))}
-              className="w-full accent-[#FF5500] cursor-pointer"
+              className="w-full accent-cyan-400 cursor-pointer"
             />
-            <p className="text-[11px] text-neutral-500 mt-1">
+            <div className="text-[11px] text-slate-400 italic">
               {getRpeDescription(rpe)}
-            </p>
+            </div>
           </div>
 
-          {/* Distance & Sleep */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Recovery & Sleep */}
+          <div className="grid grid-cols-2 gap-3 pt-2">
             <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                Distance Covered (km)
+              <label className="block text-xs font-mono-code text-slate-400 mb-1">
+                Sleep (Hours): {sleepHours}h
               </label>
               <input
-                type="number"
-                min="0"
-                max="150"
-                step="0.5"
-                value={distanceKm}
-                onChange={(e) => setDistanceKm(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs font-mono-code focus:outline-none focus:ring-1 focus:ring-[#FF5500]"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-neutral-700 mb-1">
-                Sleep Last Night (Hours)
-              </label>
-              <input
-                type="number"
-                min="3"
-                max="14"
-                step="0.5"
+                type="range"
+                min={4}
+                max={12}
+                step={0.5}
                 value={sleepHours}
                 onChange={(e) => setSleepHours(Number(e.target.value))}
-                className="w-full px-3 py-2 rounded-xl bg-white border border-neutral-200 text-xs font-mono-code focus:outline-none focus:ring-1 focus:ring-[#FF5500]"
+                className="w-full accent-indigo-400 cursor-pointer"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-mono-code text-slate-400 mb-1">
+                Recovery Score: {recoveryScore}%
+              </label>
+              <input
+                type="range"
+                min={20}
+                max={100}
+                step={5}
+                value={recoveryScore}
+                onChange={(e) => setRecoveryScore(Number(e.target.value))}
+                className="w-full accent-emerald-400 cursor-pointer"
               />
             </div>
           </div>
 
-          {/* Estimated Load Output Banner */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-mono-code uppercase font-semibold text-[#FF5500] block">
-                Calculated Session Effort
-              </span>
-              <div className="text-xl font-bold font-mono-code text-neutral-900">
-                {calculatedLoad}{' '}
-                <span className="text-xs font-normal text-neutral-500">Load Points (AU)</span>
-              </div>
-              <span className="text-[11px] text-neutral-600">
-                {durationMinutes} min × {rpe} RPE intensity
-              </span>
-            </div>
-            <div className="text-right">
-              <span className="text-[10px] font-mono-code uppercase text-neutral-400 block">
-                Classification
-              </span>
-              <span className="text-xs font-bold text-[#FF5500]">
-                {calculatedLoad >= 800
-                  ? 'Heavy Match Effort'
-                  : calculatedLoad >= 500
-                  ? 'Hard Training Day'
-                  : calculatedLoad >= 300
-                  ? 'Moderate Training'
-                  : 'Light Recovery'}
-              </span>
-            </div>
-          </div>
-
-          {/* Buttons */}
-          <div className="pt-2 flex items-center justify-end gap-2.5">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-full text-xs font-medium text-neutral-600 hover:text-neutral-900"
-            >
-              Cancel
-            </button>
+          <div className="pt-3">
             <button
               type="submit"
-              className="px-5 py-2 rounded-full bg-[#FF5500] hover:bg-[#E84E00] text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs"
+              className="w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-mono-code font-bold text-xs shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all flex items-center justify-center gap-2"
             >
-              <Check className="w-3.5 h-3.5" />
-              <span>Save &amp; Update Plan</span>
+              <Check className="w-4 h-4" />
+              Save Workout & Recompute ACWR
             </button>
           </div>
         </form>

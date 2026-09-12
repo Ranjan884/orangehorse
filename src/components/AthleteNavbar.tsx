@@ -9,42 +9,33 @@ import {
   Database,
   Menu,
   X,
-  ArrowRight,
-  ShieldCheck,
-  AlertTriangle,
-  Flame,
-  Download,
-  HelpCircle,
   PlusCircle,
-  Settings,
-  BookOpen
+  BookOpen,
+  User,
+  Zap,
 } from 'lucide-react';
-import { AthleteMetrics, SportType } from '../types';
+import { AthleteMetrics, AthleteProfile } from '../types';
+
+export type ActiveTabType = 'overview' | 'analytics' | 'microcycle' | 'coach' | 'simulation' | 'logs';
 
 interface AthleteNavbarProps {
-  activeTab: 'dashboard' | 'plan' | 'ai-coach' | 'simulation' | 'raw-data';
-  onSelectTab: (tab: 'dashboard' | 'plan' | 'ai-coach' | 'simulation' | 'raw-data') => void;
+  activeTab: ActiveTabType;
+  onSelectTab: (tab: ActiveTabType) => void;
   metrics: AthleteMetrics;
-  onTriggerSummary: () => void;
-  isGeneratingSummary: boolean;
-  onExportCSV: () => void;
   onOpenGuide: () => void;
   onOpenLogWorkout: () => void;
-  onOpenSettings: () => void;
-  currentSport?: SportType;
+  onOpenProfile: () => void;
+  profile: AthleteProfile;
 }
 
 export const AthleteNavbar: React.FC<AthleteNavbarProps> = ({
   activeTab,
   onSelectTab,
   metrics,
-  onTriggerSummary,
-  isGeneratingSummary,
-  onExportCSV,
   onOpenGuide,
   onOpenLogWorkout,
-  onOpenSettings,
-  currentSport = 'Soccer',
+  onOpenProfile,
+  profile,
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -57,50 +48,50 @@ export const AthleteNavbar: React.FC<AthleteNavbarProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Simplified names for normal people
   const navTabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: Activity, hint: 'Summary & Stats' },
-    { id: 'plan', label: '7-Day Plan', icon: Calendar, hint: 'Workout Schedule' },
-    { id: 'ai-coach', label: 'AI Coach', icon: Bot, hint: 'Ask Questions' },
-    { id: 'simulation', label: 'What-If Lab', icon: Sliders, hint: 'Test Scenarios' },
-    { id: 'raw-data', label: 'Past Workouts', icon: Database, hint: 'History & Logs' },
-  ] as const;
+    { id: 'overview' as const, label: 'Neural HUD', icon: Activity, tag: 'Status' },
+    { id: 'analytics' as const, label: 'Analytics', icon: Zap, tag: '0.8–1.3' },
+    { id: 'microcycle' as const, label: '7-Day Plan', icon: Calendar, tag: 'Cycle' },
+    { id: 'coach' as const, label: 'AI Coach', icon: Bot, tag: 'Uplink' },
+    { id: 'simulation' as const, label: 'What-If Lab', icon: Sliders, tag: 'Sim' },
+    { id: 'logs' as const, label: 'Logs', icon: Database, tag: 'History' },
+  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 transition-all duration-300">
       <div className="max-w-7xl mx-auto">
         <nav
-          className={`relative flex items-center justify-between px-3 sm:px-5 py-2 sm:py-2.5 rounded-full transition-all duration-300 glass-nav border border-orange-200/80 ${
-            isScrolled ? 'shadow-lg bg-white/90 backdrop-blur-2xl' : 'shadow-sm bg-white/75 backdrop-blur-xl'
+          className={`relative flex items-center justify-between px-3.5 sm:px-5 py-2.5 rounded-2xl transition-all duration-300 neural-glass-nav ${
+            isScrolled ? 'shadow-[0_10px_35px_rgba(0,0,0,0.8)] border-cyan-500/30' : 'border-cyan-500/20'
           }`}
           id="athlete-main-navigation"
         >
-          {/* Brand Logo - Orange Horse Theme */}
+          {/* Brand Logo - Neural Interface Theme */}
           <div className="flex items-center gap-2 sm:gap-3">
             <button
-              onClick={() => onSelectTab('dashboard')}
-              className="flex items-center gap-2 text-left group focus:outline-none"
+              onClick={() => onSelectTab('overview')}
+              className="flex items-center gap-2.5 text-left group focus:outline-none"
               id="brand-logo-btn"
             >
-              {/* Vibrant Orange Horse Mark */}
-              <div className="relative w-8 h-8 rounded-xl bg-gradient-to-br from-[#FF5500] to-[#FF7700] text-white flex items-center justify-center font-bold text-base shadow-xs group-hover:scale-105 transition-transform">
-                <span>🐎</span>
+              <div className="relative w-8 h-8 rounded-xl bg-cyan-950 border border-cyan-400/50 text-cyan-400 flex items-center justify-center font-bold text-sm shadow-[0_0_15px_rgba(0,240,255,0.3)] group-hover:scale-105 transition-transform">
+                <span className="font-mono-code font-black text-xs">NI</span>
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm sm:text-base font-extrabold tracking-tight text-neutral-900 font-display">
-                    OrangeHorse
+                  <span className="text-sm sm:text-base font-bold tracking-tight text-white font-display">
+                    NEURAL<span className="text-cyan-400">INTERFACE</span>
                   </span>
-                  <span className="hidden xs:inline-block text-[10px] font-mono-code uppercase font-bold text-[#FF5500] px-1.5 py-0.2 rounded bg-orange-100">
-                    Pro AI
+                  <span className="hidden md:inline-block text-[9px] font-mono-code uppercase font-bold text-cyan-400 px-1.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/30">
+                    ACWR 0.8–1.3
                   </span>
                 </div>
               </div>
             </button>
           </div>
 
-          {/* Desktop Fluid Navigation Links */}
-          <div className="hidden lg:flex items-center gap-1 relative">
+          {/* Desktop Fluid Navigation Tabs */}
+          <div className="hidden lg:flex items-center gap-1 relative bg-black/40 p-1 rounded-xl border border-cyan-500/20">
             {navTabs.map((tab) => {
               const isActive = activeTab === tab.id;
               const Icon = tab.icon;
@@ -109,167 +100,135 @@ export const AthleteNavbar: React.FC<AthleteNavbarProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => onSelectTab(tab.id)}
-                  className={`relative px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 focus:outline-none ${
-                    isActive ? 'text-neutral-900 font-bold' : 'text-neutral-600 hover:text-neutral-900'
+                  className={`relative px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5 focus:outline-none ${
+                    isActive ? 'text-cyan-300 font-bold' : 'text-slate-400 hover:text-slate-200'
                   }`}
                   id={`nav-tab-${tab.id}`}
                 >
                   {isActive && (
                     <motion.div
-                      layoutId="navbar-pill-indicator"
-                      className="absolute inset-0 rounded-full bg-white shadow-xs border border-orange-200"
+                      layoutId="neural-nav-pill"
+                      className="absolute inset-0 rounded-lg bg-cyan-950/70 border border-cyan-400/60 shadow-[0_0_15px_rgba(0,240,255,0.25)]"
                       transition={{
                         type: 'spring',
-                        stiffness: 420,
-                        damping: 34,
+                        stiffness: 400,
+                        damping: 30,
                       }}
                     />
                   )}
-                  <Icon className={`relative z-10 w-3.5 h-3.5 ${isActive ? 'text-[#FF5500]' : 'opacity-70'}`} />
+                  <Icon className={`relative z-10 w-3.5 h-3.5 ${isActive ? 'text-cyan-400' : 'opacity-70'}`} />
                   <span className="relative z-10">{tab.label}</span>
                 </button>
               );
             })}
           </div>
 
-          {/* Right Action Controls: Quick Guide + Log Workout + Balance Badge */}
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Live Training Balance Pill */}
+          {/* Right Action Controls */}
+          <div className="flex items-center gap-2">
+            {/* Live Balance Telemetry Badge */}
             <div
-              className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono-code font-bold border ${
+              className={`hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-mono-code font-bold border transition-all ${
                 metrics.acwrStatus === 'sweet-spot'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  ? 'bg-emerald-950/50 text-emerald-400 border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
                   : metrics.acwrStatus === 'caution'
-                  ? 'bg-amber-50 text-amber-800 border-amber-200'
+                  ? 'bg-amber-950/50 text-amber-400 border-amber-500/40 shadow-[0_0_12px_rgba(245,158,11,0.2)]'
                   : metrics.acwrStatus === 'danger'
-                  ? 'bg-rose-50 text-rose-800 border-rose-200 animate-pulse'
-                  : 'bg-blue-50 text-blue-800 border-blue-200'
+                  ? 'bg-rose-950/60 text-rose-400 border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.3)] animate-pulse'
+                  : 'bg-cyan-950/50 text-cyan-400 border-cyan-500/40'
               }`}
-              title="Your Training Balance Ratio (0.8–1.3 is the injury-free Sweet Spot)"
+              title="Current ACWR Balance: 0.8–1.3 is the injury-free Sweet Spot"
             >
               <span
-                className={`w-2 h-2 rounded-full ${
+                className={`w-1.5 h-1.5 rounded-full ${
                   metrics.acwrStatus === 'sweet-spot'
-                    ? 'bg-emerald-500'
+                    ? 'bg-emerald-400 shadow-[0_0_8px_#10B981]'
                     : metrics.acwrStatus === 'caution'
-                    ? 'bg-amber-500'
+                    ? 'bg-amber-400 shadow-[0_0_8px_#F59E0B]'
                     : metrics.acwrStatus === 'danger'
-                    ? 'bg-rose-500'
-                    : 'bg-blue-500'
+                    ? 'bg-rose-400 shadow-[0_0_8px_#F43F5E]'
+                    : 'bg-cyan-400 shadow-[0_0_8px_#00F0FF]'
                 }`}
               />
-              <span className="text-[11px]">
-                {metrics.currentACWR.toFixed(2)}{' '}
-                {metrics.acwrStatus === 'sweet-spot'
-                  ? '• Sweet Spot'
-                  : metrics.acwrStatus === 'caution'
-                  ? '• High Load'
-                  : metrics.acwrStatus === 'danger'
-                  ? '• Spike Danger'
-                  : '• Light Load'}
-              </span>
+              <span>{metrics.currentACWR.toFixed(2)} ACWR</span>
             </div>
 
-            {/* Quick Guide / Tutorial Button */}
+            {/* Profile Button */}
             <button
-              onClick={onOpenGuide}
-              className="px-2.5 sm:px-3 py-1 rounded-full bg-orange-100 hover:bg-orange-200 text-[#FF5500] text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs"
-              title="View simple guide and tutorial for normal people"
-              id="btn-nav-guide"
+              onClick={onOpenProfile}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-cyan-500/30 bg-slate-950/70 hover:bg-cyan-950/50 hover:border-cyan-400 text-xs text-slate-200 transition-all font-mono-code"
+              title="Calibrate Athlete Profile"
+              id="profile-btn"
             >
-              <HelpCircle className="w-3.5 h-3.5" />
-              <span className="hidden xs:inline">App Guide</span>
+              <User className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="hidden md:inline font-bold truncate max-w-[100px]">{profile.name.split(' ')[0]}</span>
             </button>
 
-            {/* + Log Workout Button */}
+            {/* + Log Session Button */}
             <button
               onClick={onOpenLogWorkout}
-              className="px-2.5 sm:px-3 py-1 rounded-full bg-[#FF5500] hover:bg-[#E84E00] text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs active:scale-95"
-              id="btn-nav-log-workout"
-              title="Record a completed workout"
+              className="flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-mono-code font-bold text-xs shadow-[0_0_15px_rgba(0,240,255,0.35)] transition-all"
+              id="log-session-btn"
             >
               <PlusCircle className="w-3.5 h-3.5" />
-              <span>+ Log Workout</span>
+              <span className="hidden xs:inline">Log Session</span>
             </button>
 
-            {/* Settings Button */}
+            {/* Guide Button */}
             <button
-              onClick={onOpenSettings}
-              className="p-1.5 rounded-full bg-black/5 hover:bg-black/10 text-neutral-700 transition-colors"
-              title="More options & Athlete Profile"
-              id="btn-nav-settings"
+              onClick={onOpenGuide}
+              className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-cyan-500/20 bg-slate-950/60 hover:bg-slate-900 text-slate-300 text-xs font-mono-code transition-all"
+              title="Interactive System Guide"
+              id="guide-btn"
             >
-              <Settings className="w-4 h-4" />
+              <BookOpen className="w-4 h-4 text-cyan-400" />
             </button>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-full bg-black/5 text-neutral-800 lg:hidden"
-              aria-label="Toggle Menu"
+              className="lg:hidden p-1.5 rounded-xl text-slate-400 hover:text-white border border-cyan-500/20"
+              aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 text-cyan-400" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
-
-          {/* Mobile Drawer */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="lg:hidden absolute top-full left-0 right-0 mt-2 p-4 rounded-3xl glass-dropdown shadow-xl border border-orange-200 overflow-hidden"
-              >
-                <div className="flex flex-col gap-1.5">
-                  {navTabs.map((tab) => {
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => {
-                          onSelectTab(tab.id);
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-medium flex items-center justify-between ${
-                          activeTab === tab.id ? 'bg-orange-50 font-bold text-[#FF5500] border border-orange-200' : 'text-neutral-700 hover:bg-white/60'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2.5">
-                          <Icon className="w-4 h-4" />
-                          <span>{tab.label}</span>
-                          <span className="text-[10px] text-neutral-400">({tab.hint})</span>
-                        </span>
-                        <ArrowRight className="w-3.5 h-3.5 text-neutral-400" />
-                      </button>
-                    );
-                  })}
-
-                  <div className="pt-2 mt-2 border-t border-orange-100 flex items-center justify-between gap-2">
-                    <button
-                      onClick={() => {
-                        onOpenGuide();
-                        setMobileMenuOpen(false);
-                      }}
-                      className="flex-1 py-2 rounded-xl bg-orange-100 text-[#FF5500] text-xs font-bold text-center"
-                    >
-                      📖 Beginner Guide
-                    </button>
-                    <button
-                      onClick={() => {
-                        onExportCSV();
-                        setMobileMenuOpen(false);
-                      }}
-                      className="py-2 px-3 rounded-xl bg-black/5 text-neutral-700 text-xs font-medium"
-                    >
-                      <Download className="w-4 h-4 inline mr-1" /> CSV
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </nav>
+
+        {/* Mobile Dropdown Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="lg:hidden mt-2 p-3 rounded-2xl neural-card border border-cyan-500/30 shadow-[0_15px_40px_rgba(0,0,0,0.9)]"
+            >
+              <div className="grid grid-cols-2 gap-2">
+                {navTabs.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        onSelectTab(tab.id);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`p-2.5 rounded-xl text-left border flex items-center gap-2 transition-all ${
+                        isActive
+                          ? 'bg-cyan-950/70 border-cyan-400 text-cyan-300'
+                          : 'bg-black/30 border-slate-800 text-slate-400 hover:border-cyan-500/30'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 text-cyan-400" />
+                      <div className="text-xs font-medium">{tab.label}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </header>
   );

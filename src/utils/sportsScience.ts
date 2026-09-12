@@ -1,45 +1,75 @@
-import { AthleteSession, AthleteMetrics, MicrocycleDay, MatchFixture, AgentReasoningLog, ACWRStatus } from '../types';
+import { AthleteSession, AthleteMetrics, MicrocycleDay, MatchFixture, AgentReasoningLog, ACWRStatus, AthleteProfile } from '../types';
 
-// Generate 28 days of historical training session data
-export function generateInitialHistory(): AthleteSession[] {
+// Generate 28 days of historical training session data adapted to the athlete's custom profile
+export function generateInitialHistory(profile?: AthleteProfile): AthleteSession[] {
   const sessions: AthleteSession[] = [];
   const today = new Date();
 
+  // Multiplier from profile intensity
+  let intensityFactor = 1.0;
+  if (profile?.baselineIntensity === 'Light') intensityFactor = 0.68;
+  else if (profile?.baselineIntensity === 'Moderate') intensityFactor = 1.0;
+  else if (profile?.baselineIntensity === 'Heavy') intensityFactor = 1.35;
+  else if (profile?.baselineIntensity === 'Elite') intensityFactor = 1.65;
+
+  const daysPerWeek = profile?.daysPerWeek || 5;
+
   // Pattern of loads over the last 28 days
-  const baseLoads = [
-    520, 640, 180, 710, 580, 950, 0, // Week 1 (ended with match)
-    480, 620, 690, 200, 540, 980, 0, // Week 2
-    550, 700, 210, 660, 590, 1020, 0, // Week 3
-    510, 680, 220, 740, 610, 1050, 0  // Week 4 (recent)
+  const rawBase = [
+    520, 640, 180, 710, 580, 920, 0, // Week 1
+    490, 630, 680, 200, 550, 960, 0, // Week 2
+    540, 710, 210, 650, 600, 990, 0, // Week 3
+    520, 670, 220, 730, 620, 1020, 0 // Week 4
   ];
 
   for (let i = 27; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
     const dateStr = d.toISOString().split('T')[0];
-    const rawLoad = baseLoads[27 - i] || 500;
-    
-    // Day label
-    const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
-    const isMatch = rawLoad >= 900;
-    const isRest = rawLoad === 0;
-    const isRec = rawLoad > 0 && rawLoad <= 250;
+    const dayOfWeek = d.getDay(); // 0 = Sun, 6 = Sat
 
-    const sessionType = isMatch
-      ? 'Match'
-      : isRest
-      ? 'Rest Day'
-      : isRec
-      ? 'Recovery Block'
-      : rawLoad > 650
-      ? 'Development Session'
-      : 'Tactical Session';
+    // Calibrate rest days based on daysPerWeek
+    let isDayRest = false;
+    if (daysPerWeek <= 3 && (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 5 || dayOfWeek === 0)) {
+      isDayRest = true;
+    } else if (daysPerWeek === 4 && (dayOfWeek === 2 || dayOfWeek === 4 || dayOfWeek === 0)) {
+      isDayRest = true;
+    } else if (daysPerWeek === 5 && (dayOfWeek === 3 || dayOfWeek === 0)) {
+      isDayRest = true;
+    } else if (daysPerWeek === 6 && dayOfWeek === 0) {
+      isDayRest = true;
+    }
+
+    let rawLoad = Math.round((rawBase[27 - i] || 500) * intensityFactor);
+    if (isDayRest) {
+      rawLoad = 0;
+    }
+
+    const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
+    const isMatch = rawLoad >= Math.round(850 * intensityFactor);
+    const isRest = rawLoad === 0;
+    const isRec = rawLoad > 0 && rawLoad <= Math.round(250 * intensityFactor);
+
+    // Dynamic session types adapted to sport
+    const sportName = profile?.sport?.toLowerCase() || 'general';
+    let sessionType = 'Tactical Session';
+    if (isMatch) {
+      sessionType = sportName.includes('run') ? 'Race / Time Trial' : sportName.includes('cycl') ? 'Gran Fondo / Race' : 'Match Day';
+    } else if (isRest) {
+      sessionType = 'Rest Day';
+    } else if (isRec) {
+      sessionType = 'Recovery Block';
+    } else if (rawLoad > Math.round(620 * intensityFactor)) {
+      sessionType = sportName.includes('run') ? 'Tempo & Intervals' : sportName.includes('gym') ? 'Heavy Power & Volume' : 'Development Session';
+    } else {
+      sessionType = sportName.includes('run') ? 'Aerobic Base Run' : sportName.includes('gym') ? 'Functional Strength' : 'Tactical Session';
+    }
 
     const distanceM = isRest
       ? 0
-      : Math.round(rawLoad * (isMatch ? 10.5 : 8.2) + Math.random() * 200);
-    const rpe = isRest ? 0 : isMatch ? 9 : isRec ? 3 : Math.min(8, Math.max(4, Math.round(rawLoad / 90)));
-    const recovery = isRest ? 85 : Math.round(78 - (rawLoad / 25) + (Math.random() * 12));
+      : Math.round(rawLoad * (isMatch ? 11 : 8.5) + (Math.random() * 150));
+    const rpe = isRest ? 0 : isMatch ? 9 : isRec ? 3 : Math.min(8, Math.max(4, Math.round(rawLoad / (80 * intensityFactor))));
+    const recovery = isRest ? 88 : Math.round(80 - (rawLoad / (24 * intensityFactor)) + (Math.random() * 10));
     const sleepHours = Math.round((7 + Math.random() * 2) * 10) / 10;
 
     sessions.push({

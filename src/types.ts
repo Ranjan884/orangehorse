@@ -52,16 +52,33 @@ export interface AgentReasoningLog {
   level: 'optimal' | 'warning' | 'critical' | 'info';
 }
 
-export type SportType = 'Soccer' | 'Running' | 'Equestrian' | 'Cycling' | 'Gym' | 'Tennis' | 'Basketball';
+export type SportType =
+  | 'Soccer'
+  | 'Running'
+  | 'Cycling'
+  | 'Basketball'
+  | 'Tennis'
+  | 'Gym'
+  | 'Swimming'
+  | 'Equestrian'
+  | 'Track & Field'
+  | 'CrossFit'
+  | 'Rowing'
+  | 'Other';
 
 export type TrainingGoal = 'competition' | 'endurance' | 'injury-free' | 'fitness';
 
 export interface AthleteProfile {
   name: string;
-  sport: SportType;
+  sport: string;
   positionOrDiscipline: string;
   goal: TrainingGoal;
   experienceLevel: 'Beginner' | 'Intermediate' | 'Advanced' | 'Pro';
+  daysPerWeek?: number;
+  baselineIntensity?: 'Light' | 'Moderate' | 'Heavy' | 'Elite';
+  upcomingEventName?: string;
+  upcomingEventDays?: number;
+  isCustomProfile?: boolean;
 }
 
 export interface ChatMessage {
