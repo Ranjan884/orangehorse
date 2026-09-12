@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #FAF8F5;
+    color: #1D1814;
+  }
+}
+
+.font-display {
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Orange Horse Glass Utilities */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 237, 213, 0.9);
+  box-shadow: 0 10px 30px -5px rgba(255, 85, 0, 0.05), 0 2px 8px -2px rgba(29, 24, 20, 0.03);
+}
+
+.glass-dropdown {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(254, 215, 170, 0.8);
+  box-shadow: 0 20px 40px -10px rgba(234, 88, 12, 0.12), 0 4px 15px -2px rgba(29, 24, 20, 0.05);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.68);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(254, 215, 170, 0.6);
+  box-shadow: 0 4px 20px -2px rgba(29, 24, 20, 0.03);
+}
+
+/* Orange Horse Vibrant Gradient text */
+.text-orange-horse {
+  background: linear-gradient(135deg, #FF4500 0%, #FF6600 50%, #FFA200 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-orange-horse-gradient {
+  background: linear-gradient(135deg, #FF5500 0%, #FF6B00 60%, #FA8C16 100%);
+}
+
+.border-orange-subtle {
+  border-color: rgba(254, 215, 170, 0.8);
+}
+
+/* Subtle glow for highlights */
+.orange-horse-glow {
+  box-shadow: 0 0 25px -4px rgba(255, 85, 0, 0.25);
+}
+

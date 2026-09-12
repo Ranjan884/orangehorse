@@ -1,0 +1,6 @@
+{
+  "name": "Autonomous Athlete Performance Planner",
+  "description": "Smart athlete training planner with the energetic Orange Horse theme, simplified workout balance guides, interactive tutorials, and AI performance coaching.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
